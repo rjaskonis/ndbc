@@ -36,8 +36,8 @@ app.get('/', (req, res) => {
     //     res.status(500).json('error');
     // })
 
-    db.mysql.north.table('people').setData({ name:'Fulano de tal', birthdate:'1990-01-20', money:0 }).then(response => {
-        // console.log(response);
+    db.mssql.north.table('people').setData({ id:2, name:'Beltrano de tal Filho', birthdate:'1990-01-20', money:0 }).then(response => {
+        console.log(response);
         res.send(':)');
     }).catch(err => {
         console.log(err);
