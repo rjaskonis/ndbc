@@ -29,7 +29,7 @@ var db = {
 // console.log('** NDBC **');
 
 app.get('/', (req, res) => {
-    // db.mssql.first.table('SA1').getData().then(people => {
+    // db.mssql.first.table('SA1').getData({ where:{ A1_NOME:'RENNE JASKONIS' } }).then(people => {
     //     console.log(people);
     //     res.send('people');
     // }).catch(err => {
@@ -45,13 +45,13 @@ app.get('/', (req, res) => {
     //     res.status(500).json('error');
     // })
 
-    db.mysql.north.table('people').setData({ money: null }, { where:{ 'birthdate not':null} }).then(response => {
-        console.log(response);
-        res.send(':)');
-    }).catch(err => {
-        console.log(err);
-        res.status(500).json('error');
-    })
+    // db.mysql.north.table('people').setData({ money: null }, { where:{ 'birthdate not':null} }).then(response => {
+    //     console.log(response);
+    //     res.send(':)');
+    // }).catch(err => {
+    //     console.log(err);
+    //     res.status(500).json('error');
+    // })
 
     // PROTOTYPE
     // db.mssql.north.query("SELECT * FROM todos WHERE description like {description}").execute({ description: '%T%'}).then(list => {
