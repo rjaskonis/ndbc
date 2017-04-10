@@ -30,27 +30,32 @@ var db = {
 
 app.get('/', (req, res) => {
     // ** MySQL JOIN EXAMPLE **
-    // db.mysql.aquadoc.table('pessoas')
-    // .join({
-    //     type:'inner',
-    //     table: {
-    //         name:'pessoas',
-    //         alias:'fornecedor',
-    //         columns:['id','nome']
-    //     },
-    //         on:[{ foreignColumn:'representantecomercial', column:'id' },{ foreignColumn:'nomecomercial', column:'fornecedor' }]
-    //     })
-    // .join({ type:'inner', table: { name:'pessoas', alias:'representante', columns:['id','nome']}, on:[{ foreignColumn:'representantecomercial', column:'id' }] })
-    // .getData({ where:{ id:1 } }).then(pessoas => {
-    //     console.log(pessoas);
-    // })
+    db.mysql.aquadoc.table('pessoas')
+    .getData({
+        where:{ id:1 },
+        joins: [
+            {
+                type:'inner',
+                table: {
+                    name:'pessoas',
+                    alias:'fornecedor',
+                    columns:['id','nome']
+                },
+                on:[{ foreignColumn:'representantecomercial', column:'id' },{ foreignColumn:'nomecomercial', column:'fornecedor' }]
+            },
+            { type:'inner', table: { name:'pessoas', alias:'representante', columns:['id','nome']}, on:[{ foreignColumn:'representantecomercial', column:'id' }] }
+    ]}).then(pessoas => {
+        console.log(pessoas);
+    })
 
     // ** MySQL JOIN EXAMPLE (realistic)**
     db.mysql.aquadoc.table('pessoas')
-    .join({ table:{ name:'pessoas', alias:'representante', columns:['nome']}, on:[{ foreignColumn:'representantecomercial', column:'id' }] })
     .getData({
         columns:['id','nome'],
-        where:{ id:1 }
+        where:{ id:1 },
+        joins: [
+            { table:{ name:'pessoas', alias:'representante', columns:['nome', 'nomefantasia']}, on:[{ foreignColumn:'representantecomercial', column:'id' }] }
+        ]
     }).then(pessoas => {
         res.json(pessoas);
     })
