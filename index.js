@@ -28,37 +28,24 @@ var db = {
 //
 // console.log('** NDBC **');
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     // ** MySQL JOIN EXAMPLE **
-    db.mysql.aquadoc.table('pessoas')
-    .getData({
-        where:{ id:1 },
-        joins: [
-            {
-                type:'inner',
-                table: {
-                    name:'pessoas',
-                    alias:'fornecedor',
-                    columns:['id','nome']
-                },
-                on:[{ foreignColumn:'representantecomercial', column:'id' },{ foreignColumn:'nomecomercial', column:'fornecedor' }]
-            },
-            { type:'inner', table: { name:'pessoas', alias:'representante', columns:['id','nome']}, on:[{ foreignColumn:'representantecomercial', column:'id' }] }
-    ]}).then(pessoas => {
-        console.log(pessoas);
-    })
+    const acompanhamentosproducao = await db.mysql.aquadoc.table('acompanhamentosproducao').getData({ datetimeFormat:'DD/MM/YYYY' });
+
+    console.log(acompanhamentosproducao);
+    return res.json(acompanhamentosproducao);
 
     // ** MySQL JOIN EXAMPLE (realistic)**
-    db.mysql.aquadoc.table('pessoas')
-    .getData({
-        columns:['id','nome'],
-        where:{ id:1 },
-        joins: [
-            { table:{ name:'pessoas', alias:'representante', columns:['nome', 'nomefantasia']}, on:[{ foreignColumn:'representantecomercial', column:'id' }] }
-        ]
-    }).then(pessoas => {
-        res.json(pessoas);
-    })
+    // db.mysql.aquadoc.table('pessoas')
+    // .getData({
+    //     columns:['id','nome'],
+    //     where:{ id:1 },
+    //     joins: [
+    //         { table:{ name:'pessoas', alias:'representante', columns:['nome', 'nomefantasia']}, on:[{ foreignColumn:'representantecomercial', column:'id' }] }
+    //     ]
+    // }).then(pessoas => {
+    //     res.json(pessoas);
+    // })
 
     // ** SQL SERVER JOIN EXAMPLE (realistic)**
     // db.mssql.north.table('todos')
@@ -104,4 +91,4 @@ app.get('/', (req, res) => {
     // })
 })
 
-app.listen(3000);
+app.listen(4000);
