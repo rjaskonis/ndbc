@@ -8,7 +8,7 @@ var db = {
         aquadoc: new ndbc.mysql.Reference({ host:'127.0.0.1', user:'root', password:'root', database:'db_aquadoc', timezone: 0300 })
     },
     mssql: {
-        north: new ndbc.mssql.Reference({ user: 'SA', password: 'Fly11031507',server: '127.0.0.1', database: 'north', stream:true, connectionTimeout:30000, requestTimeout:30000 }),
+        north: new ndbc.mssql.Reference({ user: 'SA', password: 'Fly1507!',server: '127.0.0.1', database: 'north', stream:true, connectionTimeout:30000, requestTimeout:30000 }),
         first: new ndbc.mssql.Reference({ user: 'SA', password: 'Aqua12!',server: '172.16.100.100', database: 'first', stream:true, connectionTimeout:30000, requestTimeout:30000 })
     }
 }
@@ -30,10 +30,10 @@ var db = {
 
 app.get('/', async (req, res) => {
     // ** MySQL JOIN EXAMPLE **
-    const acompanhamentosproducao = await db.mysql.aquadoc.table('acompanhamentosproducao').getData({ datetimeFormat:'DD/MM/YYYY' });
+    // const acompanhamentosproducao = await db.mysql.aquadoc.table('acompanhamentosproducao').getData({ columns:['id', 'produto', 'dataregistro'], datetimeFormat:'DD/MM/YYYY' });
 
-    console.log(acompanhamentosproducao);
-    return res.json(acompanhamentosproducao);
+    // console.log(acompanhamentosproducao);
+    // return res.json(acompanhamentosproducao);
 
     // ** MySQL JOIN EXAMPLE (realistic)**
     // db.mysql.aquadoc.table('pessoas')
@@ -48,11 +48,15 @@ app.get('/', async (req, res) => {
     // })
 
     // ** SQL SERVER JOIN EXAMPLE (realistic)**
-    // db.mssql.north.table('todos')
-    // .join({ table:{ name:'people', alias:'responsible', columns:['name']}, on:[{ foreignColumn:'responsible', column:'id' }] })
-    // .getData({ where:{ 'id not': 0 }}).then(people => {
-    //     res.json(people);
-    // })
+    const data = await db.mssql.north.table('todos').getData({ 
+        where:{ 'id not': 0 }, 
+        datetimeFormat:'DD/MMM YYYY',
+        joins: [
+            { table:{ name:'people', alias:'person' }, on:[{ foreignColumn:'responsible', column:'id' }] }
+        ]
+    });
+
+    return res.json(data)
 
     // db.mysql.aquadoc.table('pessoas').getData({ where:{ id:1 } }).then(pessoas => {
     //     res.json(pessoas);
