@@ -1,32 +1,44 @@
-var express = require('express');
-var app = express();
-var ndbc = require('./lib/ndbc');
+const express = require('express');
+const app = express();
+const ndbc = require('./lib/ndbc');
+const sumTryCatch = require('./sum-try-catch');
+const mssql = require('mssql');
+const { performance } = require('perf_hooks');
 
-var db = {
+const db = {
     mysql: {
         north: new ndbc.mysql.Reference({ host:'127.0.0.1', user:'root', password:'root', database:'north', timezone: 0300 }),
         aquadoc: new ndbc.mysql.Reference({ host:'127.0.0.1', user:'root', password:'root', database:'db_aquadoc', timezone: 0300 })
     },
     mssql: {
-        north: new ndbc.mssql.Reference({ user: 'SA', password: 'Fly1507!',server: '127.0.0.1', database: 'north', stream:true, connectionTimeout:30000, requestTimeout:30000 }),
-        first: new ndbc.mssql.Reference({ user: 'SA', password: 'Aqua12!',server: '172.16.100.100', database: 'first', stream:true, connectionTimeout:30000, requestTimeout:30000 })
+        north: new ndbc.mssql.Reference({ user: 'SA', password: 'Fly1507!',server: '127.0.0.1', database: 'north', stream:true, connectionTimeout:30000, requestTimeout:30000, options: { encrypt: false } }),
+        first: new ndbc.mssql.Reference({ user: 'SA', password: 'Aqua12!',server: '172.16.1.2', database: 'first', stream:true, connectionTimeout:30000, requestTimeout:30000, options: { encrypt: false } })
     }
 }
 
+const run = (async () => {
+    const people = await db.mysql.aquadoc.table('pessoas').getData({ where:{ id:1 } });
+    console.log(people);
+    
+})()
 
-// db.north.table('todos').getData().then(todos => {
-//     console.log(todos);
-// }).catch(err => console.log(err))
-//
-// db.aquadoc.table('tarefas').getData().then(tarefas => {
-//     console.log(tarefas);
-// }).catch(err => console.log(err))
-//
-// db.first.table('SG1').getData().then(data => {
-//     console.log(data);
-// }).catch(err => console.log(err))
-//
-// console.log('** NDBC **');
+// const t0 = performance.now();
+// db.mssql.north.table('people').getData().then(people => {
+//     const t1 = performance.now();
+//     console.log(people);
+//     console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");    
+// })
+
+// db.mssql.north.table('people').setData({ name:`I'm Thirteen "GREAT!` }).then(response => {
+//     db.mssql.north.table('people').getData().then(people => {
+//         console.log(people);
+//     })
+    
+// })
+// .catch(error => {
+//     console.log(error);    
+// })
+
 
 app.get('/', async (req, res) => {
     // ** MySQL JOIN EXAMPLE **
@@ -48,13 +60,7 @@ app.get('/', async (req, res) => {
     // })
 
     // ** SQL SERVER JOIN EXAMPLE (realistic)**
-    const data = await db.mssql.north.table('todos').getData({ 
-        where:{ 'id not': 0 }, 
-        datetimeFormat:'DD/MMM YYYY',
-        joins: [
-            { table:{ name:'people', alias:'person' }, on:[{ foreignColumn:'responsible', column:'id' }] }
-        ]
-    });
+    const data = await sumTryCatch(db.mssql.north.table('people').getData());
 
     return res.json(data)
 
@@ -95,5 +101,5 @@ app.get('/', async (req, res) => {
     // })
 })
 
-app.listen(4000);
+// app.listen(4000);
 
